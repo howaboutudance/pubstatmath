@@ -1,0 +1,85 @@
+---
+title: 'Labwork 1: Pg. 13 #1-6, '
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+# Dplyr Excercises
+
+## 1: 
+load the data
+```{r}
+# uhis case driectly via the url from the github of ggplot2
+url = "https://raw.githubusercontent.com/tidyverse/ggplot2/master/data-raw/msleep.csv"
+
+msleep =  read.csv(url)
+
+#loiok at the head to see what the data looks liek
+head(msleep)
+```
+
+# 2: 
+
+filter only order Primates
+```{r}
+# load dplyr
+library(dplyr)
+
+primates <- filter(msleep, order == "Primates")
+
+# show that primates data.frame only has primate in it
+head(primates)
+
+# get the summary statistics of  primates
+summary(primates)
+
+# finally how many records are there?
+nrow(primates)
+```
+
+since knitr errored (filed a bug), here are some screenshots
+
+![/home/crimson/develop/pubstatmeth/assignments/getting_started/Screenshot from 2018-01-22 09-28-02.png]
+# 3:
+What class is the primate subset
+
+```{r}
+# I expect it's a data.frame so let's check that theory with a equality
+class(primates) == "data.frame"
+```
+Yep!
+
+# 4:
+select only total sleep, what class is it?
+
+```{r}
+# select sleep_total from msleep
+totalSleepSub <- dplyr::select(msleep, sleep_total)
+
+# since we know primate is a data.frame let's compare them
+class(totalSleepSub) == class(primates)
+```
+Cool!
+
+# 5:
+select only totalsleep from primates as a numeric vector
+```{r}
+totalSleepVect <- select(msleep, sleep_total) %>% unlist
+
+# True if totalSleepVect is a numeric vector
+class(totalSleepVect) == "numeric"
+
+# now the mean
+mean(totalSleepVect)
+```
+
+#6:
+
+use summarize to get the mean, removing the convert to vector step
+```{r}
+# use summarise based on the docs
+select(msleep, sleep_total) %>% summarise(mean=mean(sleep_total))
+
+```

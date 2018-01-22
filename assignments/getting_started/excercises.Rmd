@@ -15,5 +15,35 @@ install_github("jennybc/gapminder")
 not going to do swirl since I alreeady used it during the summer internship.
 
 ```{r}
+# install rafalib that is used in some data analysis later
 install.packages("rafalib")
+library(rafalib)
+```
 
+Demonstrate how to load a csv file:
+
+```{r}
+url <- "https://github.com/genomicsclass/dagdata/raw/master/inst/extdata/femaleMiceWeights.csv"
+
+mouse_weights = read.csv(url)
+
+summary(mouse_weights)
+```
+
+There a few others way to do this, including loadin local files:
+
+```{r}
+mw_path <- "./femaleMiceWeights.csv"
+lmouse_weights <- read.csv(mw_path)
+summary(lmouse_weights)
+```
+
+```{r}
+plot(x = mouse_weights$Diet, mouse_weights$Bodyweight)
+```
+
+```{r}
+plot(cars$speed, cars$dist)
+car_reg_line = lm(cars$dist~cars$speed)
+summary(car_reg_line)
+```
