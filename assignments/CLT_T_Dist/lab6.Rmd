@@ -1,0 +1,63 @@
+---
+title: "Lab 6"
+output: html_notebook
+---
+
+```{r}
+## import dplyr & rafalib library
+library(dplyr)
+library(rafalib)
+
+## bring data  in from a txt file
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/babies.txt"
+filename <- basename(url)
+download.file(url, destfile=filename)
+babies <- read.table("babies.txt", header=TRUE)
+```
+
+```{r}
+## create an object and assign smoke and nonsmoke as variables
+bwt.nonsmoke <- babies %>% filter(smoke == 0) %>% select(bwt) %>% unlist
+bwt.smoke <- babies %>% filter(smoke == 1) %>% select(bwt) %>% unlist
+
+## get the mean of the differences
+mean(bwt.nonsmoke) - mean(bwt.smoke)
+popsd(bwt.nonsmoke)
+popsd(bwt.smoke)
+```
+Hypotheis: whether babies of non-smoking mothers siginficantly are different from smoking mother's babies thus:
+
+$$h_0: \bar{X} = \bar{Y}$$
+$$h_a: \bar{X} \neq \bar{Y}$$
+
+
+```{r}
+
+N = 25
+set.seed(1)
+dat.ns <- sample(bwt.nonsmoke, N)
+dat.s <- sample(bwt.smoke, N)
+
+X.ns <- mean(dat.ns)
+sd.ns <- sd(dat.ns)
+
+X.s <- mean(dat.s)
+sd.s <- sd(dat.s)
+
+sd.diff <- sqrt((sd.ns^2/N)+(sd.s^2/N))
+tval <- (X.s - X.ns)/sd.diff
+print(tval)
+```
+```{r}
+
+righttail <- 1 - pnorm(abs(tval))
+lefttail <- pnorm(-abs(tval))
+pval <- lefttail + righttail
+print(pval)
+```
+
+```{r}
+Q = qnorm(0.99)
+Q*sd.diff
+
+```

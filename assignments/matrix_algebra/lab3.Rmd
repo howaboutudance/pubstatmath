@@ -1,0 +1,110 @@
+---
+title: "Lab 3"
+output: html_notebook
+---
+
+This lab has me reviewing part of inference as from Stats and R ph525.1x. I am
+going from using inference and applying matrix algebra work to it.
+
+```{r}
+## as always import dplyr first just in case I need it
+library(dplyr)
+```
+
+# Example 1
+
+Looking at least square estimates, let's do a simple physics problem!
+
+```{r}
+
+g = 9.8 # gravatational constant in meters/seconds
+
+h0 = 56.67 # height in meters
+
+v0 = 0 # intial velocity
+
+n = 25 # number of measurements
+
+tt = seq(0,3.4, len=n) # time in seconds as a vector
+
+## calculate Y, rnorm introduces measurement error through creatng a normal
+## distrubutation with n samples and sd of 1 and adding it to a polynomial
+## equation with the height as the 0 degree term, velcoity in the 1 degree term
+## and gravity constant and time squared in the 2 degree term (supposedly pret##
+## common in phsyics *shrugs*)
+set.seed(1)
+y = h0 + v0 * tt - 0.5*g*tt^2+rnorm(n, sd=1)
+
+## now let's take the LSE
+
+## create matrix with 1 in one coliumn repeated, the tt in another and tt^2 in
+## another representing  c b a of a ax^2+bx+c polynomia
+iX = cbind(1, tt, tt^2)
+
+## get crosspoduct of X (XtX) and solve then  matrix multiple transposed X
+iA = solve(crossprod(iX)) %*% t(iX)
+```
+
+## 1
+
+given defined A, whcich of the following is the LSE of g?
+
+```{r}
+-2*(iA %*% y)[3]
+```
+
+## 2
+
+the estimate of g is a variable, use a monte carlo simulation (using replicate and sampling 10,000) to estimate the standard error of the sampling distrubutation of g with sd.
+
+```{r}
+rn = 100000
+ll = function(){
+  y = h0 + v0 * tt - 0.5*g*tt^2+rnorm(n, sd=1)
+  -2*(iA %*% y)[3]
+}
+gs = replicate(rn, ll())
+sd(gs)
+hist(gs)
+```
+
+# Example 2
+
+using father and son height data from UsingR, we are going to look at some of the correlation between them using LSE.
+
+```{r}
+library(UsingR)
+fathers = father.son$fheight
+sons = father.son$sheight
+
+n = length(sons)
+```
+
+create Monte Carlo simulation (resampling disturubution with replacement):
+
+```{r}
+
+## create a function to be use by replicate to generate samples of father.son
+## linear model coefficents/betas
+gen_samps <- function(){
+  # generate a list of  50 array-index values in a vactor based on the length of
+  # the father height data
+  index = sample(n,50)
+  sampledat = father.son[index,]
+  
+  # sample father and sons as:
+  # sfathers: sample of fathers
+  # ssons: sample of sons
+  sfathers = sampledat$fheight
+  ssons = sampledat$sheight
+  
+  # get betahats that are coming lm (which is linear model) coefficents (coef)
+  betas <- lm(ssons ~ sfathers)$coef
+  return(betas)
+}
+set.seed(1)
+samps <- replicate(10000, gen_samps())
+```
+
+##2
+

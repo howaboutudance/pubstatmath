@@ -1,0 +1,117 @@
+---
+title: "Lab 1"
+author: "Michael Penhallegon"
+output:
+  html_document:
+    df_print: paged
+---
+
+#1
+
+Suppose x is R. Which of the following is **not** equivalent to X?
+
+B. X %*% matrix(1, ncol(x))
+
+would result in a vector of 3 x 1 dimensions:
+
+$$\begin{bmatrix}
+1 & 3 \\
+2 & 4
+\end{bmatrix}$$
+
+which the equivalent to:
+
+```{r}
+x <- matrix(1:4, 2)
+```
+
+with B's code:
+
+```{r}
+x %*% matrix(1,ncol(x))
+```
+
+
+or it's vector equivalent:
+
+$$\begin{bmatrix}
+4 \\
+6
+\end{bmatrix}$$
+
+#2
+
+taking:
+
+$$
+3a + 4b - 5c + d = 10 \\
+2a + 2b + 2c - d = 5 \\
+2a + 2b + 2c - 5d = 7 \\
+5a + d = 4
+$$
+
+becomes:
+
+$$
+\begin{pmatrix}
+3 & 5 & -5 & 1 \\
+2 & 2 & 2 & 1 \\
+1 & -1 & 5 & 5 \\
+5 & 0 & 0 & 1
+\end{pmatrix}
+\begin{pmatrix}
+a \\
+b \\
+c \\
+d
+\end{pmatrix}
+=
+\begin{pmatrix}
+10 \\
+5 \\
+7 \\
+4
+\end{pmatrix}
+\implies
+\begin{pmatrix}
+a \\
+b \\
+c \\
+d
+\end{pmatrix}
+=
+\begin{pmatrix}
+3 & 5 & -5 & 1 \\
+2 & 2 & 2 & 1 \\
+1 & -1 & 5 & 5 \\
+5 & 0 & 0 & 1
+\end{pmatrix}^{-1}
+\begin{pmatrix}
+10 \\
+5 \\
+7 \\
+4
+\end{pmatrix}
+$$
+which in R is:
+```{r}
+matrix_2 <- matrix(c(3,2,1,5, # a column
+                     4, 2, -1, 0, # b column
+                     -5, 2, -5, 0, # c column
+                     1, 1, 5, 1), 4, 4) #d  column
+vector_2 <- matrix(c(10, 5, 7, 4), 4)
+
+solve(matrix_2) %*% vector_2
+
+newx = 1
+
+fitted <- Axs %*% betas
+```
+
+
+```
+rss <- function(beta0, beta1, beta2){
+  r <- y - (beta0+beta1*tt+beta2*tt^2)
+  sum(r^2)
+}
+}

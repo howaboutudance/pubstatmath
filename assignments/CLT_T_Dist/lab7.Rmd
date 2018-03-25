@@ -1,0 +1,142 @@
+---
+title: "Lab 7"
+output: html_notebook
+---
+# T-Test Excercies
+## 1
+```{r}
+library(dplyr)
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/babies.txt"
+filename <- basename(url)
+download.file(url, destfile=filename)
+babies <- read.table("babies.txt", header=TRUE)
+```
+```{r}
+bwt.nonsmoke <- filter(babies, smoke==0) %>% select(bwt) %>% unlist 
+bwt.smoke <- filter(babies, smoke==1) %>% select(bwt) %>% unlist
+```
+```{r}
+b25.N = 25
+b25 = 
+set.seed(1)
+b25.s = sample(bwt.smoke, b25.N)
+set.seed(1)
+b25.n = sample(bwt.nonsmoke, b25.N)
+b25.n.x = mean(b25.n)
+b25.s.x = mean(b25.s)
+
+b25.diff <- b25.n.x - b25.s.x
+Q <- qt(0.99, df=2*b25.N-2)
+
+se <- sqrt(sd(b25.n)^2/b25.N+sd(b25.s)^2/b25.N)
+
+
+c(b25.diff-Q*se, b25.diff+Q*se)
+Q*sqrt( sd( b25.n)^2/b25.N + sd(b25.s)^2/b25.N )
+Q*se
+```
+
+```{r}
+b5 = function(){
+  N = 5
+  set.seed(1)
+  n = sample(bwt.nonsmoke, b5.N)
+  s = sample(bwt.smoke, b5.N)
+  
+  tstat <- t.test(n, s)
+  return(tstat$p.value)
+}
+
+b5()
+```
+
+# Power Calculations
+
+## 1
+```{r}
+## I am statingt to write my problem solutions as function so that I can
+## advantage of the fact that functions have their own scope so that I don't
+## have to be afraid of repeating common function names. If I wanted to be
+## really fancy I  could do this as a class with methods for each solution so
+## that I could actually share scope between problem solutions
+
+## based on the code as seen from pg 65 of the book
+## take  a problem set function and to geneerate samples and then
+## run the rejection test
+reject <- function(func, N, alpha=0.05, seed=FALSE, conf=0.95){
+  samples = data.frame(func(N, seed=seed))
+  colnames(samples) = c("treatment", "control")
+  pval = t.test(samples$treatment, samples$control, conf.level = conf)$p.value
+  return(pval < alpha)
+}
+
+power1 = function(N, seed = FALSE, alpha = 0.05){
+  if(seed){
+    set.seed(1)
+  }
+  n = sample(bwt.nonsmoke, N)
+  s = sample(bwt.smoke, N)
+  
+  return(cbind(s,n))
+  
+}
+
+reject(power1, 5, seed=FALSE)
+```
+## 2
+```{r}
+power2 = replicate(10000, reject(power1, 5))
+
+sum(power2)/length(power2)
+```
+
+##3
+
+Do the same as Excercise 2 but do it for when N is 30, 60, 90 and 120
+
+
+```{r}
+
+## let's go a little dark with some variable names!
+
+## rejecting_babies takes a N samplesize and runs the similar code to #2 that
+## will replicatte 10000 times at N samplesize
+replicating_babies <- function(samplesize){
+  s = replicate(10000, reject(power1, samplesize))
+  sum(s)/length(s)
+}
+
+sample_ns = c(30, 60, 90, 120)
+
+## sapply "applies" the function with sample_ns as paramaters
+## is the equivalent to:
+##
+## rejecting_babies(30)
+## rejecting_babies(60)
+## rejecting_babies(90)
+## rejecting_babies(120)
+##
+## and return the return values as a vector
+sample_perc = sapply(sample_ns, replicating_babies)
+
+## create a dataframe, with samples_ns as one column and sample_perc as another
+samples_df = data.frame(cbind(samples_ns, sample_perc))
+plot(samples_df$samples_ns, samples_df$sample_perc, type = 'l', xlab = "Sample Size", ylab = "Percentage(%)")
+abline(h = 0.8, col="red")
+```
+
+## 4
+
+do #3 but when $\alpha$ is 0.01
+
+```{r}
+replicating_babies4 <- function(samplesize){
+  s = replicate(10000, reject(power1, samplesize, alpha = 0.01))
+  sum(s)/length(s)
+}
+
+sample4_perc = sapply(sample_ns, replicating_babies4)
+sample4_df = data.frame(cbind(sample_ns, sample4_perc))
+plot(sample4_df$sample_ns, sample4_df$sample4_perc, type = 'l', xlab = "Sample Size", ylab = "Percentage(%)")
+abline(h = 0.8, col="red")
+```

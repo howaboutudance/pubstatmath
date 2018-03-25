@@ -1,0 +1,76 @@
+---
+title: "Lab 5"
+output: html_notebook
+---
+
+# Central Limit Theorem and T-distribution
+```{r}
+# library loading
+library(downloader)
+library(dplyr)
+
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/femaleMiceWeights.csv"
+filename <- "femaleMiceWeights.csv"
+if(!file.exists(filename)) download(url, destfile=filename)
+dat <- read.csv(filename)
+
+```
+
+#1
+
+```{r}
+n = 100
+
+x_dice = sample(1:6, n, replace=TRUE) #sample with replacement!
+
+mean(x_dice == 6)
+
+rs = 10000 #10,00 replications
+p = 1/6 #portion of sample tht is 6
+va = p*(1-p)/n #variance
+z = (mean(x_dice==6) - p) / sqrt(p*(1-p)/n)
+p
+z
+va
+```
+```{r}
+set.seed(1)
+samps = abs(replicate(rs, mean(sample(1:6, n, replace=TRUE) == 6)) - p / sqrt(va))
+
+```
+
+#2
+
+#3
+
+```{r}
+set.seed(1)
+X_fmice <- dat %>% filter(Diet == "chow") %>% select(Bodyweight) %>% unlist
+Y_fmice <- dat %>% filter(Diet == "hf") %>% select(Bodyweight) %>% unlist
+mean(X_fmice)
+```
+
+#5
+
+0
+
+#4
+
+#8
+
+estimate $$SE(\bar{X}-\bar{Y}) = \sqrt{\sigma^2_y/12 + \sigma^2_x/12}$$
+
+```{r}
+se = sqrt(var(X_fmice)/12+var(Y_fmice)/12)
+print(se)
+
+diff <- X_fmice-Y_fmice
+
+tstat = abs(mean(X_fmice-Y_fmice))/se
+print(tstat)
+
+tails = c(pnorm(-abs(tstat)), 1-pnorm(abs(tstat)))
+
+sum(tails)
+t.test(X_fmice, Y_fmice)
+```

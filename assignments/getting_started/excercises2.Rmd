@@ -1,0 +1,62 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+r = c()
+for(n in 1:25){
+  v = n ** 2
+  r = c(r, v)
+}
+
+sum(r)
+```
+
+2.
+
+```{r}
+class(cars)
+```
+
+```{r}
+nrow(cars)
+```
+
+```{r}
+colnames(cars)
+```
+```{r}
+mean(cars[,2])
+```
+
+```{r}
+which(cars$dist == 85)
+```
+
+```{r}
+library(downloader) 
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/femaleMiceWeights.csv"
+filename <- "femaleMiceWeights.csv" 
+download(url, destfile=filename)
+
+FemaleMiceWeights <- read.csv(filename)
+```
+
+```{r}
+```
+```{r}
+FemaleMiceWeights$Bodyweight[11]
+```
+```{r}
+length(FemaleMiceWeights$Bodyweight)
+```
+
+```{r}
+mean(FemaleMiceWeights[13:24,2])
+```
+
+```{r}
+set.seed(1)
+sample(FemaleMiceWeights[13:24,2], 1)
+```

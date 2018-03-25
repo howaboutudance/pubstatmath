@@ -1,0 +1,39 @@
+---
+title: "Labwork 3: pg. 33-34, pg. "
+author: "Michael Penhallegon"
+output: html_notebook
+---
+
+#pg 33-34
+## Intro
+
+download the dataset and read
+
+```{r}
+# import dplyr
+library(dplyr)
+
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/mice_pheno.csv"
+
+# only the male mice!
+male_pheno <- read.csv(url) %>% filter(Sex=="M") %>% na.omit()
+
+head(male_pheno)
+```
+
+##1
+
+create a vector of all males on chow diet
+
+```{r}
+male_chow <- filter(male_pheno, Diet == "chow") %>% unlist
+mean(male_chow)
+```
+
+##2
+
+```{r}
+library(rafalib)
+
+popsd(male_chow)
+```

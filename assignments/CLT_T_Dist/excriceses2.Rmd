@@ -1,0 +1,11 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+mice_dat <- read.csv("femaleMiceWeights.csv")
+
+chow <- mice_dat %>% filter(Diet == "chow") %>% select(Bodyweight) %>% unlit
+
+hf <-  mice_dat %>% filter(Diet == "hf") %>% select(Bodyweight) %>% unlit
+

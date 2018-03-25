@@ -47,3 +47,34 @@ plot(cars$speed, cars$dist)
 car_reg_line = lm(cars$dist~cars$speed)
 summary(car_reg_line)
 ```
+```{r}
+chow <- filter(lmouse_weights, Diet=="chow") # keep only the chow diet
+head(chow)
+```
+
+```{r}
+chowVals <- select(chow, Bodyweight)
+head(chowVals)
+```
+
+```{r}
+# doing them together
+chowVals <- filter(lmouse_weights, Diet == 'chow') %>% select(Bodyweight)
+
+#showing that lmuouse_weights is a data.frame
+class(lmouse_weights)
+
+
+#and that a subset frame of lmouse_weights is also a data.frame
+
+class(lmouse_weights) == class(chowVals)
+
+```
+```{r}
+# if we need a numeric vector:
+
+chowVect <- filter(lmouse_weights) %>% select(Bodyweight) %>% unlist
+
+# and the resulting object is not a data.frame
+class(chowVect) != class(chowVals)
+```

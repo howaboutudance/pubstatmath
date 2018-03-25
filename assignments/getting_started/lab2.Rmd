@@ -1,0 +1,145 @@
+---
+title: 'Lab 2: pg. 30 #1-10'
+output:
+  html_document:
+    df_print: paged
+---
+
+# Intro
+
+```{r}
+# load dplyr
+library(dplyr)
+
+# load the dataset
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/femaleControlsPopulation.csv"
+femaleControlPop <- unlist(read.csv(url))
+```
+
+#1
+
+Average (mean) weights
+
+```{r}
+mean(femaleControlPop)
+```
+
+#2
+
+take a sample from femaleControlPop and calculate
+the absolute value difference from the sample mean
+
+```{r}
+set.seed(1)
+
+femaleControlSample <- sample(femaleControlPop, 5)
+
+# return the absolute value difference
+
+abs(mean(femaleControlSample) - mean(femaleControlPop))
+```
+
+#3
+
+
+```{r}
+# chanvge seed to 5
+set.seed(5)
+
+#take second sample
+femaleControlSample2 <- sample(femaleControlPop, 5)
+abs(mean(femaleControlSample2) - mean(femaleControlPop))
+```
+
+#4
+
+C, taking different sample will result in difference means
+
+#5
+
+```{r}
+
+set.seed(1)
+
+
+# simple_resample takes a sampleset and resamples
+## positional 
+## has the keyword parameters of:
+## func: the function that is run once the sample
+##       so for instance, passing mean will
+##       return the means of all the samples
+##       generated, defaults to the identity
+##       functions
+## ns:   the number of samples taken, defaults
+##       to 1,000
+## ss:   the size of samples taken, defaults to 5
+##
+## returns a vector of values 
+simple_resample <- function(dat, func=identity, ns=1000, ss=5){
+  
+  sam <- c()
+
+  for(n in 0:ns){
+    sam <- c(sam, func(sample(dat, ss, replace = TRUE)))
+  }
+  
+  return(sam)
+}
+
+## resample  1000 times and take the means of the resamplse to 
+resampled_FemaleControl <- simple_resample(femaleControlPop, func=mean)
+above_1 <- resampled_FemaleControl[resampled_FemaleControl > (1+mean(resampled_FemaleControl))] %>% length
+above_1 / length(resampled_FemaleControl)
+```
+
+#6
+
+resample 10,000
+```{r}
+
+
+re10000_FemaleControl <- simple_resample(femaleControlPop, ns=10000)
+above1_10000 <- re10000_FemaleControl[re10000_FemaleControl > (1+mean(re10000_FemaleControl))]
+above1_10000 %>% length / (re10000_FemaleControl %>% length)
+hist(re10000_FemaleControl)
+```
+
+#7
+
+```{r}
+#rs50_FemaleControl
+#8
+```
+
+#8
+
+```{r}
+r5 = simple_resample(femaleControlPop, func=mean)
+r50 = simple_resample(femaleControlPop, func=mean, ss=50)
+
+hist(r5)
+hist(r50)
+
+
+```
+
+B
+
+#9
+
+```{r}
+#let's create function since we have to do it > 1 times
+percentage_dist <- function(dist, lowerbound, upperbound){
+  return ((dist[(dist>=lowerbound) & (dist<=upperbound)] %>% length) / (dist %>% length))
+  
+}
+  
+percentage_dist(r50, lowerbound=23, upperbound=25)
+```
+
+#10
+
+```{r}
+model_dist = rnorm(1000, mean=23.9, sd=0.43)
+percentage_dist(model_dist, 23, 25)
+```

@@ -1,0 +1,33 @@
+---
+title: "execercises"
+output: html_notebook
+---
+```{r}
+library(dplyr)
+library(rafalib)
+
+
+```
+
+let's create ttestgenerator from pg 75 of the book
+```{r}
+
+ControlPopulation = rnorm(1000, 26)
+ttestgenerator <- function(n, tpop = ControlPopulation, cpop = ControlPopulation){
+  cases <- sample(tpop, n)
+  controls <- sample(cpop, n)
+  tstat <- (mean(cases) - mean(controls)) / sqrt(var(cases)/n+var(controls)/n)
+  return(tstat)
+  
+}
+
+ttests <- replicate(1000, ttestgenerator(10))
+ttestsa <- replicate(1000, ttestgenerator(10, tpop=rnorm(1000, 25.4, sd = 20)))
+ttestsb <- replicate(1000, ttestgenerator(10, tpop=rnorm(1000, 26.1)))
+ttestsc <- replicate(1000, ttestgenerator(10, tpop=rnorm(1000, 0)))
+mypar(2,2)
+hist(ttests, ylim = c(0,400), breaks = 15)
+hist(ttestsa, ylim = c(0,400), breaks = 15)
+hist(ttestsb, ylim = c(0,400), breaks = 15)
+hist(ttestsc, ylim = c(0,400), breaks = 15)
+```

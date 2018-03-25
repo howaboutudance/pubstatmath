@@ -1,0 +1,51 @@
+---
+title: "Excercies 1: Matrix Algebra in Practice I"
+output: html_notebook
+---
+
+```{r}
+# ewww physics
+g <- 9.8
+n <- 50
+tt = seq(0, 2, len=n)
+
+f <- 56.67 - 3.5*tt - 0.5*g*tt^2
+
+y <- f + rnorm(n, sd=3)
+
+plot(tt, y)
+lines(tt, f, col=2)
+
+
+```
+
+```{r}
+rss <- function(beta0, beta1, beta2){
+  r <- y - (beta0*tt^0+beta1*tt^2+beta2*tt^2)
+  sum(r^2)
+}
+
+beta2s = seq(-10, 0, len=100)
+RSS <- sapply(beta2s, rss, beta0=54, beta1=0)
+plot(beta2s, RSS, type="l")
+```
+
+```{r}
+X <- cbind(rep(1), tt, tt^2)
+head(X)
+
+Beta <- matrix(c(55, 0, 5), 3, 1)
+
+r <- y - X %*% Beta
+RSS2 <- t(r) %*% r
+head(RSS2)
+
+RSS2 <- crossprod(r)
+
+betahat <- solve(crossprod(X) %*% crossprod(X,y))
+```
+
+solve is unstable though so let's use qr
+
+```{r}
+QR <- qr(X)

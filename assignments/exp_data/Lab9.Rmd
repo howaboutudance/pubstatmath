@@ -1,0 +1,105 @@
+---
+title: "Lab 9"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+library(rafalib)
+
+exmp = rnorm(3000)
+
+mypar(1,2)
+qqnorm(exmp)
+qqline(exmp)
+hist(exmp)
+```
+
+# QQ-Plot excercises
+
+```{r}
+load("skew.RData")
+
+dim(dat)
+```
+
+```{r}
+
+
+par(mfrow=c(3,3))
+for(i in 1:9){
+  l = paste("Column ",i)
+  qqnorm(dat[,i], xlab="", ylab="", main=NULL)
+  title(l)
+}
+
+for(i in 1:9){
+  par(mfrow=c(1,1))
+  l = paste("Column", i)
+  hist(dat[,i], main=l, xlab=NULL, ylab = NULL)
+}
+```
+
+# Box Plot Execercises
+
+```{r}
+boxplot(InsectSprays$count ~ InsectSprays$spray)
+```
+
+```{r}
+data(nym.2002, package="UsingR")
+boxplot(nym.2002$time ~ nym.2002$gender)
+
+par(mfrow=c(2,1))
+f = nym.2002 %>% filter(gender == "Female") %>% select(time) %>% unlist
+m = nym.2002 %>% filter(gender == "Male") %>% select(time) %>% unlist
+
+hist(m, breaks = seq(min(nym.2002$time)-10, max(nym.2002$time)+10, 10), xlab=NULL, main=NULL, ylab = "Male")
+hist(f, breaks = seq(min(nym.2002$time)-10, max(nym.2002$time)+10, 10), xlab=NULL, main=NULL, ylab = "Female")
+
+median(m) - median(f)
+mean(m) - mean(f)
+# let's do a quick test
+N = 30
+sm <- sample(m, N)
+sf <- sample(f, N)
+t.test(sm, sf)
+```
+
+# Scatterplot Execrcises
+
+## 1
+```{r}
+males <- nym.2002 %>% filter(gender == "Male")
+females <- nym.2002 %>% filter(gender == "Female")
+
+plot(males$age, males$time)
+cor(males$age, males$time)
+```
+
+## 2
+
+```{r}
+plot(females$age, females$time)
+cor(females$age, females$time)
+```
+
+## 3
+```{r}
+groups <- split(males$time, 5*round(males$age/5))
+boxplot(groups)
+```
+
+# symmetry of Log Ratios Excercises
+
+```{r}
+time = sort(nym.2002$time)
+
+max(time)/median(time)
+```
+
+## 2
+
+```{r}
+min(time)/median(time)
+```

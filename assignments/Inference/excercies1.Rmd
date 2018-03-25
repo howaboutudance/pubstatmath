@@ -1,0 +1,56 @@
+---
+title: "T statistic excercises"
+author: Michael Penhallegon 
+output: html_notebook
+---
+
+```{r}
+## load dplyr & downloader
+library(dplyr)
+library(downloader)
+
+## load up female mouse weights from a csv file
+filename <- "femaleMiceWeights.csv"
+dat <- read.csv(filename)
+```
+
+create control and treatment groups and calculate difference
+
+```{r}
+## filter out chow and high fat diets and create vectors of bodyweight
+control <- dat %>% filter(Diet=="chow") %>% select(Bodyweight) %>% unlist
+treatement<- dat %>% filter(Diet=="hf") %>% select(Bodyweight) %>% unlist
+
+diff <- abs(mean(treatement) - mean(control))
+print(diff)
+
+se = sd(control)/sqrt(length(control))
+print(se)
+
+se = sqrt(
+  var(treatement)/length(treatement) +
+    var(control)/length(control)
+)
+print(se)
+
+diff + c(-se, se)
+tstat <- diff/se
+print(tstat)
+
+righttail <- 1 - pnorm(abs(tstat))
+lefttail <- pnorm(-abs(tstat))
+pval <- lefttail + righttail
+print(pval)
+
+t.test(treatement, control)
+
+## bring in rafalib for a qqplot
+library(rafalib)
+
+mypar(1,2)
+qqnorm(treatement)
+qqline(treatement, col=2)
+
+qqnorm(control)
+qqline(control, col=2)
+```

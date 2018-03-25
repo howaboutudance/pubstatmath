@@ -1,0 +1,105 @@
+---
+title: "Lab 2"
+output: html_notebook
+--- 
+
+# Example 1
+taking 4 samples. the first two samples are from a treatment group A and second two from a treatment group B.
+
+thus X will look like
+
+$$\mathbf{X} = \begin{bmatrix}
+1 & 0 \\
+1 & 0 \\
+1 & 1 \\
+1 & 1
+\end{bmatrix}$$
+
+and $\beta$ is:
+$$\beta = [5, 2]$$
+
+this is build around
+
+$$\mathbf{Y} = \mathbf{X}\beta + \epsilon$$
+thus we will be look to solve 
+
+$$\mathbf{\beta} = (\mathbf{X}^\intercal\mathbf{X})^{-1} \mathbf{X}^\intercal\mathbf{Y}$$
+
+which if find $\mathbf(X)\intercal\mathbf(Y)$ is:
+
+
+```{r}
+library(dplyr)
+
+X <- matrix(c(1,1,1,1,0,0,1,1), nrow = 4)
+betas <- matrix(c(5,2), nrow=2)
+
+#set our rownames
+
+rownames(X) <- c("a","a","b","b")
+```
+##1 
+
+find the fitted value for A
+```{r}
+Axs <- X[which(rownames(X) %in% c("a")),]
+
+#based on the code from pg 161 of the book "fitted" is:
+# X %*% betahats
+# thus the fitted value of A is Axs %*% betas
+Axs %*% betas
+```
+
+##2
+
+find the fitted value for B
+```{r}
+# and the fitted value for B is Bxs %*% betas
+Bxs <- X[which(rownames(X) %in% c("b")),]
+Bxs %*% betas
+```
+
+# Example 2
+
+Now we have a trial with two treatements, B and C, and a control, A. Each group has two samples.
+
+we will end up with B being:
+
+$$\mathbf{B} = 
+\begin{bmatrix}
+1 & 1 & 0 \\
+1 & 1 & 0
+\end{bmatrix}$$
+
+and our betas are:
+
+$$\beta = \begin{bmatrix}
+10\\
+3\\
+-3\\
+\end{bmatrix}$$
+
+##3
+
+find the fitted value for b samples
+
+```{r}
+
+X2 = cbind(c(1), c(0,0,1,1,0,0), c(0,0,0,0,1,1))
+
+row.names(X2) <- c("a","a","b","b","c","c")
+betas2 <- c(10, 3, -3)
+
+Bx2s <- X2[which(rownames(X2) %in% c("b")),]
+Bx2s %*% betas2
+```
+
+##4
+
+find the fitted value for c samples
+
+```{r}
+
+Cx2s <- X2[which(rownames(X2) %in% c("c")),]
+Cx2s %*% betas2
+```

@@ -1,0 +1,177 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Download Mice phenotypes
+```{r}
+library(downloader) 
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/mice_pheno.csv"
+filename <- basename(url)
+download(url, destfile=filename)
+dat <- read.csv(filename) 
+
+dat <- na.omit(dat)
+```
+
+```{r}
+library(dplyr)
+
+male_weights_chow <- dat %>% filter(Diet == "chow") %>% filter(Sex == "M") %>% select(Bodyweight) %>% unlist
+
+
+head(male_weights_chow)
+pop_x_bar <- mean(male_weights_chow)
+```
+
+#2
+
+get the population sd via rafalib
+
+```{r}
+library(rafalib)
+popsd(male_weights_chow)
+```
+#3
+
+```{r}
+set.seed(1)
+sample_X_bar <- mean(sample(male_weights_chow, 25))
+```
+
+#4
+
+make a vector of weights of male mice on the 'hf' diet
+
+```{r}
+male_weights_hf <- dat %>% filter(Sex == "M") %>% filter(Diet == "hf") %>% select(Bodyweight) %>% unlist
+pop_y_bar = mean(male_weights_hf)
+pop_y_bar
+```
+
+#5
+
+get the population sd of bodyweights of male mice on the 'hf' diet
+
+```{r}
+popsd(male_weights_hf)
+```
+
+#6
+
+take 25 samples and get the mean of the sample
+```{r}
+set.seed(1)
+sample_Y_bar <- mean(sample(male_weights_hf, 25))
+sample_Y_bar
+```
+
+#7
+
+take the difference between $\bar{y_m}-\bar{x_m}$ and $\bar{Y_m} - \bar{Y_m}$
+
+```{r}
+set.seed(1)
+
+abs(pop_y_bar - pop_x_bar)-abs(sample_Y_bar-sample_X_bar)
+```
+
+#8
+
+Do the same as #7 for female mice
+
+```{r}
+# set the random seed to 1 to gaurantee results
+
+# create two vectors:
+# female_weights_hf -- the bodyweights of female mice on the "hf " diets
+# femaile_weights_chow -- the bodyweights of female on the "chow" diets
+female_weights_chow <- dat %>% filter(Sex == "F") %>% filter(Diet == "chow") %>% select(Bodyweight) %>% unlist
+female_weights_hf <- dat %>% filter(Sex == "F") %>% filter(Diet == "hf") %>% select(Bodyweight) %>% unlist
+
+#get the population means of both female_weights vectors
+pop_x_bar_f <- mean(female_weights_chow)
+pop_y_bar_f <- mean(female_weights_hf)
+
+# take a sample of 25 from each vector and get the standard error of the mean
+set.seed(1)
+sample_X_bar_f <- sample(female_weights_chow, 25) %>% mean
+
+set.seed(1)
+sample_Y_bar_f <- sample(female_weights_hf, 25) %>% mean
+```
+
+Now, the difference from absolute value of $\bar{y_f} - \bar{x_f}$ and absolute value of $\bar{Y_f} - \bar{X_f}$
+```{r}
+abs(pop_y_bar_f - pop_x_bar_f) - abs(sample_Y_bar_f - sample_X_bar_f)
+
+```
+
+# CLT #2
+
+#4
+
+defining y as the body weights of male mice on the control diet ("chow") what proportion of the miace are within one $$\sigma$$ of the mean weight?
+
+```{r}
+male_y <- male_weights_chow
+
+mean_male_y <- mean(male_y)
+sd_male_y <- popsd(male_y)
+
+proportion_n <- function(x, sd=sd_male_y, x_bar=mean_male_y){
+  interval <- c(-sd, sd) + mean(x_bar)
+  props = sapply(interval, function(y){mean(x <= y)})
+  props[2] - props[1]
+}
+
+proportion_n(male_y)
+```
+
+#5
+
+$2\sigma$ from the mean
+
+```{r}
+proportion_n(male_y, sd=(sd_male_y*2))
+```
+
+#6
+$3\sigma$ from the mean
+
+```{r}
+proportion_n(male_y, sd=(sd_male_y*3))
+```
+
+#7
+
+#8
+
+```{r}
+mypar(2,2)
+y <- filter(dat, Sex=="M" & Diet=="chow") %>% select(Bodyweight) %>% unlist
+z <- ( y - mean(y) ) / popsd(y)
+qqnorm(z);abline(0,1)
+y <- filter(dat, Sex=="F" & Diet=="chow") %>% select(Bodyweight) %>% unlist
+z <- ( y - mean(y) ) / popsd(y)
+qqnorm(z);abline(0,1)
+y <- filter(dat, Sex=="M" & Diet=="hf") %>% select(Bodyweight) %>% unlist
+z <- ( y - mean(y) ) / popsd(y)
+qqnorm(z);abline(0,1)
+y <- filter(dat, Sex=="F" & Diet=="hf") %>% select(Bodyweight) %>% unlist
+z <- ( y - mean(y) ) / popsd(y)
+qqnorm(z);abline(0,1)
+```
+
+```{r}
+ y <- filter(dat, Sex=="M" & Diet=="chow") %>% select(Bodyweight) %>% unlist
+set.seed(1)
+avgs <- replicate(10000, mean( sample(y, 25)))
+mypar(1,2)
+hist(avgs)
+qqnorm(avgs)
+qqline(avgs)
+mean(avgs)
+sd(avgs)
+```
+  
